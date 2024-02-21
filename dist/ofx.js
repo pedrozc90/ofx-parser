@@ -14,32 +14,43 @@ function sgml2Xml(sgml) {
         .replace(/<(\w+?)>([^<]+)/g, "<\$1>\$2</\$1>");
 }
 function parseXml(content) {
-    return JSON.parse(xml2json_1.default.toJson(content, { coerce: false }));
+    const json = xml2json_1.default.toJson(content, { coerce: false });
+    return JSON.parse(json);
+}
+function parseOfx(content) {
+    try {
+        return parseXml(content);
+    }
+    catch (e) {
+        return parseXml(sgml2Xml(content));
+    }
 }
 function parse(data) {
     // firstly, split into the header attributes and the footer sgml
     const ofx = data.split("<OFX>", 2);
     // firstly, parse the headers
     const headerString = ofx[0].split(/\r?\n/);
-    const header = {};
+    let header = null;
     headerString.forEach((attrs) => {
         const headAttr = attrs.split(/:/, 2);
+        if (typeof headAttr[1] === "undefined")
+            return;
+        if (header == null) {
+            header = {};
+        }
         header[headAttr[0]] = headAttr[1];
     });
     // make the SGML and the XML
-    const content = `<OFX>${ofx[1]}`;
+    const content = (ofx.length !== 1) ? `<OFX>${ofx[1]}` : "";
     // Parse the XML/SGML portion of the file into an object
     // Try as XML first, and if that fails do the SGML->XML mangling
-    let dataParsed = null;
-    try {
-        dataParsed = parseXml(content);
-    }
-    catch (e) {
-        dataParsed = parseXml(sgml2Xml(content));
+    let dataParsed = parseOfx(content);
+    if (!Object.keys(dataParsed).length) {
+        dataParsed = { OFX: null };
     }
     // put the headers into the returned data
-    dataParsed.header = header;
-    return dataParsed;
+    // dataParsed.header = header;
+    return { header, ...dataParsed };
 }
 exports.parse = parse;
 function serialize(header, body) {

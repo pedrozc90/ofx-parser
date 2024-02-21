@@ -11,13 +11,13 @@ describe("ofx", () => {
         const data = parse(file);
 
         // headers
-        expect(data.header.OFXHEADER).toBe("100");
-        expect(data.header.ENCODING).toBe("USASCII");
+        expect(data.header?.OFXHEADER).toBe("100");
+        expect(data.header?.ENCODING).toBe("USASCII");
 
-        const transactions = data.OFX.BANKMSGSRSV1.STMTTRNRS.STMTRS.BANKTRANLIST.STMTTRN;
+        const transactions = data.OFX?.BANKMSGSRSV1?.STMTTRNRS?.STMTRS?.BANKTRANLIST?.STMTTRN;
         expect(transactions.length).toBe(5);
 
-        const status = data.OFX.SIGNONMSGSRSV1.SONRS.STATUS;
+        const status = data.OFX?.SIGNONMSGSRSV1?.SONRS?.STATUS;
         expect(status.CODE).toBe("0");
         expect(status.SEVERITY).toBe("INFO");
     });
@@ -27,10 +27,10 @@ describe("ofx", () => {
         const data = parse(file);
 
         // headers
-        expect(data.header.OFXHEADER).toBe("100");
-        expect(data.header.ENCODING).toBe("USASCII");
+        expect(data.header?.OFXHEADER).toBe("100");
+        expect(data.header?.ENCODING).toBe("USASCII");
 
-        var transaction = data.OFX.BANKMSGSRSV1.STMTTRNRS.STMTRS.BANKTRANLIST.STMTTRN;
+        const transaction = data.OFX?.BANKMSGSRSV1?.STMTTRNRS?.STMTRS?.BANKTRANLIST?.STMTTRN;
         expect(transaction).toStrictEqual({
             TRNTYPE: "INT",
             DTPOSTED: "20161215000550",
@@ -39,7 +39,7 @@ describe("ofx", () => {
             NAME: "Interest Paid"
         });
 
-        var status = data.OFX.SIGNONMSGSRSV1.SONRS.STATUS;
+        const status = data.OFX?.SIGNONMSGSRSV1?.SONRS?.STATUS;
         expect(status.CODE).toBe("0");
         expect(status.SEVERITY).toBe("INFO");
     });
@@ -53,4 +53,19 @@ describe("ofx", () => {
         expect(content).toBe(file);
         expect(parse(content)).toStrictEqual(data);
     });
-})
+
+    it("parse an file which contains only headers", () => {
+        const file = fs.readFileSync(path.join(__dirname, "data/just-headers.ofx"), "utf-8");
+        const data = parse(file);
+        expect(data.header?.OFXHEADER).toBe("100");
+        expect(data.header?.ENCODING).toBe("USASCII");
+        expect(data.OFX).toBe(null);
+    });
+
+    it("parse an empty file", () => {
+        const file = fs.readFileSync(path.join(__dirname, "data/no-content.ofx"), "utf-8");
+        const data = parse(file);
+        expect(data.header).toBe(null);
+        expect(data.OFX).toBe(null);
+    });
+});

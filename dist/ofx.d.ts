@@ -1,7 +1,10 @@
 export interface Ofx {
     header: {
         [key: string]: string;
-    };
+    } | null;
+    OFX: {
+        [key: string]: any;
+    } | null;
     [key: string]: any;
 }
 export declare function parse(data: string): Ofx;

@@ -1,7 +1,8 @@
 import xml2json from "xml2json";
 
 export interface Ofx {
-    header: { [key: string]: string };
+    header: { [key: string]: string } | null;
+    OFX: { [key: string]: any } | null;
     [key: string]: any;
 }
 
@@ -14,8 +15,17 @@ function sgml2Xml(sgml: string): string {
         .replace(/<(\w+?)>([^<]+)/g, "<\$1>\$2</\$1>");
 }
 
-function parseXml(content: string): { [key: string]: string } {
-    return JSON.parse(xml2json.toJson(content, { coerce: false }))
+function parseXml(content: string): any {
+    const json = xml2json.toJson(content, { coerce: false });
+    return JSON.parse(json);
+}
+
+function parseOfx(content: string): any {
+    try {
+        return parseXml(content);
+    } catch (e) {
+        return parseXml(sgml2Xml(content));
+    }
 }
 
 export function parse(data: string): Ofx {
@@ -24,28 +34,31 @@ export function parse(data: string): Ofx {
 
     // firstly, parse the headers
     const headerString = ofx[0].split(/\r?\n/);
-    const header: any = {};
+    
+    let header: any | null = null;
     headerString.forEach((attrs) => {
         const headAttr = attrs.split(/:/, 2);
+        if (typeof headAttr[1] === "undefined") return;
+        if (header == null) {
+            header = {};
+        }
         header[headAttr[0]] = headAttr[1];
     });
 
     // make the SGML and the XML
-    const content = `<OFX>${ofx[1]}`;
+    const content = (ofx.length !== 1) ? `<OFX>${ofx[1]}` : "";
 
     // Parse the XML/SGML portion of the file into an object
     // Try as XML first, and if that fails do the SGML->XML mangling
-    let dataParsed: any | null = null;
-    try {
-        dataParsed = parseXml(content);
-    } catch (e) {
-        dataParsed = parseXml(sgml2Xml(content));
+    let dataParsed = parseOfx(content);
+    if (!Object.keys(dataParsed).length) {
+        dataParsed = { OFX: null };
     }
 
     // put the headers into the returned data
-    dataParsed.header = header;
+    // dataParsed.header = header;
 
-    return dataParsed;
+    return { header, ...dataParsed };
 }
 
 export function serialize(header: any, body: any): string {
