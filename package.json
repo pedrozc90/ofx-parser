@@ -1,55 +1,60 @@
 {
-  "name": "ofx",
-  "description": "Parse OFX files into a usable data structure.",
-  "version": "0.5.0",
-  "author": {
-    "name": "Andrew Chilton",
-    "email": "andychilton@gmail.com",
-    "url": "https://chilts.org/"
-  },
-  "homepage": "https://github.com/chilts/node-ofx",
-  "contributors": [
-    {
-      "name": "Christian Sullivan",
-      "url": "http://euforic.co/"
+    "name": "ofx",
+    "version": "0.1.0",
+    "description": "Parse OFX files into a usable data structure.",
+    "main": "dist/ofx.js",
+    "types": "dist/ofx.d.ts",
+    "type": "module",
+    "scripts": {
+        "build": "tsc --project tsconfig.json",
+        "build:watch": "tsc --project tsconfig.json --watch",
+        "prepublishOnly": "npm run build",
+        "test": "jest"
     },
-    {
-      "name": "Eric Webb",
-      "url": "https://webb.codes"
+    "keywords": [
+        "ofx",
+        "open financial exchange",
+        "typescript",
+        "module"
+    ],
+    "author": {
+        "name": "Andrew Chilton",
+        "email": "andychilton@gmail.com",
+        "url": "https://chilts.org/"
     },
-    {
-      "name": "Francisco Felipe de Lima",
-      "url": "https://github.com/Felipedelima123"
+    "contributors": [
+        {
+            "name": "Christian Sullivan",
+            "url": "http://euforic.co/"
+        },
+        {
+            "name": "Eric Webb",
+            "url": "https://webb.codes"
+        },
+        {
+            "name": "Francisco Felipe de Lima",
+            "url": "https://github.com/Felipedelima123"
+        }
+    ],
+    "homepage": "https://github.com/pedrozc90/ofx-parser#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/pedrozc90/ofx-parser.git"
+    },
+    "bugs": {
+        "url": "https://github.com/pedrozc90/ofx-parser/issues"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "xml2json": "^0.12.0"
+    },
+    "devDependencies": {
+        "@jest/globals": "^29.7.0",
+        "@types/node": "^20.11.19",
+        "@types/xml2json": "^0.11.6",
+        "jest": "^29.7.0",
+        "ts-jest": "^29.1.2",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.3.3"
     }
-  ],
-  "devDependencies": {
-    "tape": "^4.6.3"
-  },
-  "dependencies": {
-    "xml2json": "^0.12.0"
-  },
-  "main": "./ofx.js",
-  "directories": {},
-  "engines": {
-    "node": ">= 0.6.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/chilts/node-ofx.git"
-  },
-  "bugs": {
-    "url": "http://github.com/chilts/node-ofx/issues",
-    "mail": "chilts@appsattic.com"
-  },
-  "license": "MIT",
-  "keywords": [
-    "ofx",
-    "open financial exchange",
-    "bank",
-    "banking",
-    "export"
-  ],
-  "scripts": {
-    "test": "tape test/*.js"
-  }
 }

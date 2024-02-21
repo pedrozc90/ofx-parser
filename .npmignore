@@ -1,0 +1,7 @@
+# node
+dist
+tests
+.gitattributes
+.gitignore
+jest.config.ts
+tsconfig.json
